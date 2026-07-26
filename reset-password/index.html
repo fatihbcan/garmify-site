@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset your password · Garmify</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Set a new password for your Garmify account.">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a1e; --muted: #5c5c6b; --line: #e5e5ec; --accent: #4c6ef5;
+    --field: #f4f4f8; --danger: #d64545; --success: #2f9e6f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #131316; --fg: #ececf0; --muted: #a0a0b0; --line: #2c2c34; --accent: #8da2fb;
+            --field: #1d1d22; --danger: #f08a8a; --success: #6bcf9f; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .card { width: 100%; max-width: 400px; }
+  .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; color: var(--accent); margin: 0 0 4px; text-align: center; }
+  h1 { font-size: 21px; margin: 20px 0 8px; text-align: center; }
+  p.sub { color: var(--muted); margin: 0 0 24px; text-align: center; }
+  label { display: block; font-size: 14px; color: var(--muted); margin: 0 0 6px; }
+  input {
+    width: 100%; padding: 12px 14px; margin: 0 0 16px; font-size: 16px;
+    background: var(--field); color: var(--fg); border: 1px solid var(--line);
+    border-radius: 12px; outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  button {
+    width: 100%; padding: 13px; font-size: 16px; font-weight: 600; color: #fff;
+    background: var(--accent); border: none; border-radius: 999px; cursor: pointer;
+  }
+  button:disabled { opacity: 0.55; cursor: default; }
+  .msg { font-size: 14px; margin: 4px 0 16px; min-height: 18px; }
+  .msg.error { color: var(--danger); }
+  .msg.ok { color: var(--success); }
+  .center { text-align: center; }
+  .hidden { display: none; }
+  .foot { text-align: center; color: var(--muted); font-size: 14px; margin-top: 22px; }
+  .foot a { color: var(--accent); text-decoration: none; }
+  .spinner { color: var(--muted); text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <p class="logo">Garmify</p>
+
+    <!-- Shown while we validate the recovery link -->
+    <div id="loading" class="spinner">Checking your link…</div>
+
+    <!-- Shown when the link is valid: the new-password form -->
+    <form id="form" class="hidden" autocomplete="off">
+      <h1>Set a new password</h1>
+      <p class="sub">Choose a new password for your Garmify account.</p>
+
+      <label for="pw">New password</label>
+      <input id="pw" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+
+      <label for="pw2">Confirm new password</label>
+      <input id="pw2" type="password" autocomplete="new-password" placeholder="Re-enter your password">
+
+      <div id="formMsg" class="msg"></div>
+      <button id="submit" type="submit">Update password</button>
+    </form>
+
+    <!-- Shown on success -->
+    <div id="done" class="hidden center">
+      <h1>Password updated</h1>
+      <p class="sub">Your password has been changed. Open the Garmify app and sign in with your new password.</p>
+    </div>
+
+    <!-- Shown when the link is invalid or expired -->
+    <div id="invalid" class="hidden center">
+      <h1>Link expired</h1>
+      <p class="sub" id="invalidMsg">This password reset link is invalid or has expired. Request a new one from the Garmify app.</p>
+    </div>
+
+    <div class="foot"><a href="../">Back to Garmify</a></div>
+  </div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // The anon (publishable) key is designed to ship in clients — safe in this public page.
+  const SUPABASE_URL = 'https://mvtpoelnzcuxxinavluu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12dHBvZWxuemN1eHhpbmF2bHV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNDcyMzUsImV4cCI6MjA5OTYyMzIzNX0.ITyFugq8XRgzbK-5BNiFpJckj_T1p_6VzPHyxZ4qMgA';
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { detectSessionInUrl: true, flowType: 'implicit', persistSession: false },
+  });
+
+  const el = (id) => document.getElementById(id);
+  const show = (id) => el(id).classList.remove('hidden');
+  const hide = (id) => el(id).classList.add('hidden');
+
+  function showForm() { hide('loading'); hide('invalid'); show('form'); el('pw').focus(); }
+  function showInvalid(message) {
+    hide('loading'); hide('form');
+    if (message) el('invalidMsg').textContent = message;
+    show('invalid');
+  }
+
+  let settled = false;
+  function reveal(session, errorMessage) {
+    if (settled) return;
+    settled = true;
+    if (session) showForm();
+    else showInvalid(errorMessage);
+  }
+
+  // A valid recovery link puts the user into a temporary recovery session.
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) reveal(session);
+  });
+
+  (async () => {
+    // Surface an error Supabase passed back in the URL, if any.
+    const q = new URLSearchParams(location.search);
+    const h = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const urlError = q.get('error_description') || h.get('error_description');
+    if (urlError) { reveal(null, decodeURIComponent(urlError.replace(/\+/g, ' '))); return; }
+
+    // Newer email templates send a token_hash instead of an inline session — verify it.
+    const tokenHash = q.get('token_hash');
+    const type = q.get('type');
+    if (tokenHash && type) {
+      const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+      reveal(error ? null : data.session, error?.message);
+      return;
+    }
+
+    // Otherwise the session is detected from the URL (implicit/PKCE). Give it a moment.
+    const check = async () => (await supabase.auth.getSession()).data.session;
+    let session = await check();
+    if (session) { reveal(session); return; }
+    setTimeout(async () => reveal(await check()), 900);
+  })();
+
+  el('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = el('pw').value;
+    const pw2 = el('pw2').value;
+    const msg = el('formMsg');
+    msg.className = 'msg';
+    msg.textContent = '';
+
+    if (pw.length < 8) { msg.classList.add('error'); msg.textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw !== pw2) { msg.classList.add('error'); msg.textContent = 'Passwords don’t match.'; return; }
+
+    el('submit').disabled = true;
+    el('submit').textContent = 'Updating…';
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    if (error) {
+      msg.classList.add('error');
+      msg.textContent = error.message || 'Something went wrong. Please try again.';
+      el('submit').disabled = false;
+      el('submit').textContent = 'Update password';
+      return;
+    }
+    await supabase.auth.signOut(); // clear the temporary recovery session
+    hide('form');
+    show('done');
+  });
+</script>
+</body>
+</html>
