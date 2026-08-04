@@ -51,6 +51,7 @@
   .foot { text-align: center; color: var(--muted); font-size: 14px; margin-top: 22px; }
   .foot a { color: var(--accent); text-decoration: none; }
   .success-mark { color: var(--success); font-size: 40px; }
+  .okbtn { display: inline-block; margin-top: 14px; padding: 12px 40px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 999px; font-weight: 600; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -93,6 +94,7 @@
       <div class="success-mark">✓</div>
       <h1>Account deleted</h1>
       <p class="sub">Your Garmify account and all associated data have been permanently removed. We're sorry to see you go.</p>
+      <a class="okbtn" href="/">OK</a>
     </div>
 
     <div class="foot">
@@ -152,14 +154,29 @@
       return;
     }
 
-    // 2) Run the same server-side deletion the app uses, calling the RPC with the signed-in
-    //    user's access token set explicitly as a Bearer header (exactly as the app does). This
-    //    is what makes auth.uid() resolve to this user server-side — relying on supabase-js to
-    //    attach the token here did not, so the delete silently no-op'd. The RPC deletes the
-    //    caller's own account and all associated data, so it takes no arguments.
     hide('form');
     show('working');
     const accessToken = signInData.session.access_token;
+    const userId = signInData.session.user.id;
+
+    // 2) Purge the user's garment image files via the Storage API first, so the real file
+    //    bytes are removed — deleting only the DB rows would orphan the files in storage.
+    //    Best-effort: if it fails, account + data deletion below still proceeds. Files live
+    //    flat at `<userId>/<id>.png`; page through the folder in case there are many.
+    try {
+      for (;;) {
+        const { data: files, error: listErr } =
+          await supabase.storage.from('garments').list(userId, { limit: 100 });
+        if (listErr || !files || files.length === 0) break;
+        const { error: rmErr } =
+          await supabase.storage.from('garments').remove(files.map((f) => `${userId}/${f.name}`));
+        if (rmErr || files.length < 100) break;
+      }
+    } catch (_) { /* best-effort; the RPC clears the object rows too */ }
+
+    // 3) Run the server-side account deletion (same RPC the app uses), sending the signed-in
+    //    user's access token as an explicit Bearer header so auth.uid() resolves to this user.
+    //    The RPC deletes the auth user and cascade-deletes all their data rows.
     let deleted = false;
     let failureDetail = '';
     try {
