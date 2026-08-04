@@ -141,28 +141,49 @@
     submit.textContent = 'Verifying…';
 
     // 1) Prove it's really the account owner by signing in with their password.
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: pw });
-    if (signInError) {
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (signInError || !signInData?.session) {
       msg.classList.add('error');
-      msg.textContent = /invalid/i.test(signInError.message || '')
+      msg.textContent = /invalid/i.test(signInError?.message || '')
         ? 'Incorrect email or password.'
-        : (signInError.message || 'Could not verify your account. Please try again.');
+        : (signInError?.message || 'Could not verify your account. Please try again.');
       submit.disabled = false;
       submit.textContent = 'Permanently delete my account';
       return;
     }
 
-    // 2) Run the same server-side deletion the app uses. The RPC deletes the caller's own
-    //    account and all associated data (auth.uid() on the server), so it needs no arguments.
+    // 2) Run the same server-side deletion the app uses, calling the RPC with the signed-in
+    //    user's access token set explicitly as a Bearer header (exactly as the app does). This
+    //    is what makes auth.uid() resolve to this user server-side — relying on supabase-js to
+    //    attach the token here did not, so the delete silently no-op'd. The RPC deletes the
+    //    caller's own account and all associated data, so it takes no arguments.
     hide('form');
     show('working');
-    const { error: rpcError } = await supabase.rpc('delete_account');
+    const accessToken = signInData.session.access_token;
+    let deleted = false;
+    let failureDetail = '';
+    try {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/delete_account`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: '{}',
+      });
+      deleted = resp.ok;
+      if (!deleted) failureDetail = `${resp.status} ${await resp.text()}`;
+    } catch (err) {
+      failureDetail = err?.message || 'network error';
+    }
 
     // 3) Always drop the temporary session, whether or not deletion succeeded.
-    await supabase.auth.signOut();
+    await supabase.auth.signOut().catch(() => {});
 
-    if (rpcError) {
+    if (!deleted) {
       // Surface the failure and send them to the email fallback rather than claim success.
+      console.error('Account deletion failed:', failureDetail);
       hide('working');
       show('form');
       confirm.checked = false;
