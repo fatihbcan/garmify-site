@@ -48,14 +48,14 @@
 <header>
   <a class="brand" href="/">Garmify</a>
   <h1>Privacy Policy</h1>
-  <p class="muted">Last updated: 30 July 2026</p>
+  <p class="muted">Last updated: 7 September 2026</p>
 </header>
 
 <div class="card">
   <h2>The short version</h2>
   <ul>
     <li><strong>Your wardrobe lives on your device and is backed up to your private account.</strong> Your clothing images, outfit history, plans and packing lists are kept on your phone and synced to your Garmify account in the cloud, so they come back when you reinstall. Only you can access them.</li>
-    <li><strong>We do not track you.</strong> Garmify contains no analytics, no advertising, no crash-reporting and no third-party tracking software of any kind.</li>
+    <li><strong>We do not track you across other apps or websites.</strong> Garmify carries no advertising, no attribution and no cross-app tracking software, and does not use an advertising identifier. It does include Firebase Crashlytics, so we learn when the app breaks, and Firebase Analytics — which is <strong>off until you turn it on</strong>, and which you can turn back off at any time in <strong>Profile → Share usage data</strong>.</li>
     <li><strong>We never sell your data.</strong> Not to anyone, for any purpose.</li>
     <li><strong>We use an AI provider</strong>, reached through our own server, to tag your garment photos and to suggest outfits. It receives your photos and written descriptions of your clothes and preferences — never your name, email or account identifier.</li>
     <li><strong>You can delete your account from inside the app</strong>, and it really deletes it — on your device <em>and</em> from our servers, including your images.</li>
@@ -69,7 +69,7 @@
   For data protection purposes, we are the <em>data controller</em> for the information described in this policy.
 </p>
 <p>
-  Contact: <a href="mailto:support@fatihberatcan.com">support@fatihberatcan.com</a><br>
+  Contact: <a href="mailto:canfatihberat.support@gmail.com">canfatihberat.support@gmail.com</a><br>
   Postal address: Nihat Danışman Mah., Gazi Osman Paşa Cd. No:25, 45500 Soma/Manisa, Türkiye
 </p>
 
@@ -80,6 +80,33 @@
   When you create an account we collect your <strong>email address, password, first name and surname</strong>.
   Your password is never stored in readable form — it is hashed by our authentication provider, and we cannot see it.
   We use this information solely to create and secure your account, sign you in, and address you by name in the app.
+</p>
+<p>
+  <strong>If you sign in with Google.</strong> You can create your account with Google instead of choosing a password.
+  When you do, Google tells us your <strong>email address and your name</strong>, and we store them in your Garmify
+  account exactly as if you had typed them yourself — nothing else is collected, and we never see your Google password.
+  We do not keep any Google credential that would let us reach your Google account or act on your behalf. Google will
+  know that you have signed in to Garmify, and for that part it acts on its own behalf rather than ours, under
+  <a href="https://policies.google.com/privacy">Google's privacy policy</a>; you can review or withdraw Garmify's
+  access at any time in your Google account settings. Signing in this way is optional — an email address and password
+  work just as well.
+</p>
+<p>
+  <strong>If you sign in with Apple.</strong> You can also create your account with your Apple ID. Apple tells us your
+  <strong>email address and your name</strong>, and we store them in your Garmify account in the same way. If you choose
+  <strong>Hide My Email</strong>, Apple gives us a private relay address instead of your real one, and that relay address
+  is all we ever hold — mail we send to it is forwarded by Apple. Apple provides your name only the very first time you
+  authorise Garmify, which is why the app fills it in at that moment.
+</p>
+<p>
+  There is one thing we store for Apple sign-in that we do not store for Google. Apple requires that deleting your
+  Garmify account also ends Garmify's link to your Apple ID, so it stops appearing under
+  <em>Sign in with Apple</em> in your Apple account. Doing that requires a token Apple issues once, at the moment you
+  sign in, so we keep that token on our server, attached to your account. <strong>It is used for exactly one thing —
+  revoking the connection when you delete your account — and for nothing else.</strong> It cannot be read back by the
+  app or by anyone signed in to it, it grants no access to your Apple account or its contents, and it is destroyed
+  along with everything else when your account is deleted. Signing in this way is optional; an email address and
+  password work just as well.
 </p>
 
 <h3>2.2 Photos of your clothing</h3>
@@ -109,6 +136,7 @@
   <li><strong>Your age as a number</strong> — derived from your date of birth. The AI provider receives only the number, not the date itself. (Your date of birth is stored in your account — see 2.5.)</li>
   <li><strong>Your occupation, dress code and any planned activities</strong>, so the suggestion suits your day.</li>
   <li><strong>Any event description you type</strong> into the day's plan, and <strong>trip destinations and dates</strong> when building a packing list.</li>
+  <li><strong>The language the app is running in</strong>, so suggestions come back written in your language.</li>
 </ul>
 <p class="muted">
   Because a free-text event description is sent as you wrote it, please avoid putting anything sensitive or
@@ -143,6 +171,8 @@
   <li>Your saved outfits, weekly plans and packing lists</li>
   <li>Your profile preferences — gender, occupation, dress code, workdays, chosen location and temperature unit</li>
   <li>Your subscription status</li>
+  <li>A per-day count of how many AI requests you have made — a number only, kept so we can apply fair-use limits and stop a single account exhausting the service for everyone</li>
+  <li>If, and only if, you signed in with Apple: the single-purpose Apple revocation token described in 2.1</li>
 </ul>
 <p>
   A few things stay only on your device and are never sent to us — for example your notification preferences and the
@@ -159,10 +189,47 @@
   your payment card, billing address or similar financial details.</strong> We only learn whether an active subscription exists.
 </p>
 
+<h3>2.7 App activity and diagnostics</h3>
+<p>
+  Garmify uses two Google services, <strong>Firebase Analytics</strong> and <strong>Firebase Crashlytics</strong>.
+  They are treated differently, because they are different things:
+</p>
+<ul>
+  <li>
+    <strong>Crash and error reports (Crashlytics) — always on.</strong> When the app crashes, or when something
+    it can recover from fails (tagging a photo, generating an outfit, loading subscription options, removing a
+    background, syncing your wardrobe, or signing in), we receive a technical report: the error, where in the
+    code it happened, and basic device and app information such as the model, operating-system version and app
+    version. These reports contain no photos, no wardrobe contents and nothing you have written; where a report
+    concerns one of your items it names only that item's internal reference, never its picture or description. We rely on them to find and fix faults, and
+    they cannot be switched off separately from using the app.
+  </li>
+  <li>
+    <strong>Usage analytics — off unless you opt in.</strong> If you agree, we record a short, fixed list of
+    events so we can see which parts of the app are actually used: creating an account, signing in, adding an
+    item, tagging an item, subscribing, restoring purchases, deleting an account, and sending feedback. We
+    record that the action happened — not your photos, garments, outfits or any text you enter.
+  </li>
+</ul>
+<p>
+  We ask once, on your first launch inside the app, and either answer is remembered so you are not asked again.
+  Until you answer, nothing is collected. You can change your mind whenever you like in
+  <strong>Profile → Share usage data</strong>; switching it off stops collection and asks Google to delete the
+  analytics data held for that installation. Your answer is kept on the device it was given on and is
+  deliberately not copied to your other devices, because consent given on one device is not consent on another.
+</p>
+<p>
+  Both services are linked to your account identifier, so a report can be traced back to the account that hit
+  the problem. Neither is linked to an advertising identifier — Garmify does not use one, and IDFA collection
+  is explicitly disabled in the iOS app — and neither is used to build advertising or marketing profiles.
+</p>
+
 <h2>3. What we do not do</h2>
 <p>To state it plainly, Garmify does <strong>not</strong>:</p>
 <ul>
-  <li>include analytics, advertising, attribution or crash-reporting software</li>
+  <li>include advertising, attribution or cross-app tracking software, or use an advertising identifier</li>
+  <li>collect usage analytics unless you have opted in, or collect anything at all before you have answered</li>
+  <li>put your photos, wardrobe contents or anything you have written into an analytics or crash report</li>
   <li>track your behaviour across other apps or websites</li>
   <li>build advertising profiles or infer interests for marketing</li>
   <li>sell, rent or trade your personal information</li>
@@ -177,14 +244,20 @@
   </tr>
   <tr>
     <td>Supabase</td>
-    <td>Your account (email, name, hashed password); your wardrobe data and cut-out images; your profile and preferences; and, as it forwards each AI request, your garment photos and outfit descriptions — which pass through without being stored</td>
+    <td>Your account (email, name, hashed password); your wardrobe data and cut-out images; your profile and preferences; a per-day count of your AI requests; and, as it forwards each AI request, your garment photos and outfit descriptions — which pass through without being stored</td>
     <td>Accounts and sign-in; cloud backup and restore of your wardrobe; and securely relaying requests to the AI provider</td>
     <td>Australia</td>
   </tr>
   <tr>
-    <td>Groq</td>
+    <td>Google (Gemini API)</td>
     <td>Garment photos; descriptions of your clothes and style preferences (received via our Supabase server, never with your identity)</td>
     <td>Garment tagging and outfit suggestions</td>
+    <td>United States</td>
+  </tr>
+  <tr>
+    <td>Google (Firebase)</td>
+    <td>Crash and error reports with device and app details; and, only if you opt in, the usage events listed in section 2.7 — both linked to your account identifier. No photos, wardrobe contents or free text.</td>
+    <td>Crash reporting; usage analytics</td>
     <td>United States</td>
   </tr>
   <tr>
@@ -216,8 +289,8 @@
 <p>If you are in the European Economic Area, the United Kingdom, or another region with similar law, we rely on:</p>
 <ul>
   <li><strong>Performance of a contract</strong> — to create your account and provide the features you asked for, including garment tagging and outfit suggestions.</li>
-  <li><strong>Consent</strong> — for device location and for push notifications. You may withdraw either at any time in your device settings, without affecting the rest of the app.</li>
-  <li><strong>Legitimate interests</strong> — to keep the service secure and functioning, and to respond to your support requests.</li>
+  <li><strong>Consent</strong> — for device location, for notifications, and for usage analytics. Garmify's reminders are scheduled by the app on your own device: we operate no push service, and no notification token or device identifier is sent to us. You may withdraw location and notification permission at any time in your device settings, and analytics consent in <strong>Profile → Share usage data</strong>, without affecting the rest of the app.</li>
+  <li><strong>Legitimate interests</strong> — to keep the service secure and functioning, to diagnose and fix faults through crash and error reporting, and to respond to your support requests.</li>
 </ul>
 
 <h2>7. How long we keep information</h2>
@@ -226,6 +299,8 @@
   <li><strong>Your wardrobe data and images</strong> backed up to your account are kept until you delete them in the app or delete your account, at which point they are removed from our servers.</li>
   <li><strong>Photos and descriptions sent to our AI provider</strong> are processed transiently to produce tags and suggestions, and are not retained by us. The provider may retain them briefly for abuse-prevention and operational purposes under its own policy.</li>
   <li><strong>Location data</strong> is used in the moment to fetch a forecast and is not retained by us.</li>
+  <li><strong>Crash and error reports</strong> are retained by Firebase Crashlytics for up to 90 days.</li>
+  <li><strong>Usage analytics</strong>, if you opted in, are retained by Firebase Analytics for up to 14 months. Withdrawing consent stops collection and asks Google to delete what is held for that installation.</li>
   <li><strong>The on-device copy</strong> of your wardrobe remains on your device until you delete it, sign out, or uninstall the app.</li>
 </ul>
 
@@ -248,11 +323,11 @@
     This permanently removes your account and everything associated with it — your profile, your wardrobe data and your
     stored images — from our servers, and erases the Garmify data held on your device. <strong>It cannot be undone.</strong>
     If you would rather we did it for you, email
-    <a href="mailto:support@fatihberatcan.com">support@fatihberatcan.com</a> from your registered address.
+    <a href="mailto:canfatihberat.support@gmail.com">canfatihberat.support@gmail.com</a> from your registered address.
   </p>
 </div>
 
-<p>To exercise any other right, contact <a href="mailto:support@fatihberatcan.com">support@fatihberatcan.com</a>. We will respond within one month.</p>
+<p>To exercise any other right, contact <a href="mailto:canfatihberat.support@gmail.com">canfatihberat.support@gmail.com</a>. We will respond within one month.</p>
 
 <h2>9. Security</h2>
 <p>
@@ -271,7 +346,7 @@
   Garmify is not directed at children. You must be at least 13 years old to create an account, and if you are under the
   age of digital consent in your country (which is up to 16 in parts of the European Union) you need your parent or
   guardian's permission to use it. We do not knowingly collect information from children below these ages. If you believe
-  a child has provided us with personal data, contact <a href="mailto:support@fatihberatcan.com">support@fatihberatcan.com</a> and we will delete it.
+  a child has provided us with personal data, contact <a href="mailto:canfatihberat.support@gmail.com">canfatihberat.support@gmail.com</a> and we will delete it.
 </p>
 
 <h2>11. Changes to this policy</h2>
@@ -283,7 +358,7 @@
 <h2>12. Contact us</h2>
 <p>
   Questions, requests or complaints about privacy:<br>
-  <a href="mailto:support@fatihberatcan.com">support@fatihberatcan.com</a>
+  <a href="mailto:canfatihberat.support@gmail.com">canfatihberat.support@gmail.com</a>
 </p>
 
 <footer>
